@@ -19,7 +19,7 @@ async fn main() {
     schema_builder.add_text_field("code_blocks", tantivy::schema::TEXT | tantivy::schema::STORED);
     schema_builder.add_text_field("api_items", tantivy::schema::TEXT | tantivy::schema::STORED);
     let schema = schema_builder.build();
-    let index = tantivy::Index::create_in_dir("index", schema.clone()).unwrap();
+    let index = tantivy::Index::create_in_dir("../../index", schema.clone()).unwrap();
     let index_writer = index.writer(50_000_000).unwrap();
 
     let config = CrawlerConfig::default()
