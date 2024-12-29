@@ -1,0 +1,9 @@
+[package]
+name = "searcher"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tantivy = "0.19"
+fuzzy-matcher = "0.3"
+once_cell = "1.18"
