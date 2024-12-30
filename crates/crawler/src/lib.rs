@@ -5,7 +5,7 @@ mod doc_collector;
 use std::{sync::{Arc, Mutex}, time::Duration};
 
 use doc_collector::DocCollector;
-use tantivy::query::QueryParser;
+use tantivy::{query::QueryParser, schema::INDEXED, DateOptions};
 use voyager::{Collector, CrawlerConfig, RequestDelay};
 use futures::StreamExt;
 
@@ -187,6 +187,8 @@ pub async fn start_indexing() {
     schema_builder.add_text_field("domain", tantivy::schema::STORED);
     schema_builder.add_text_field("headings", tantivy::schema::TEXT | tantivy::schema::STORED);
     
+    let date_field_opts = DateOptions::from(INDEXED).set_stored().set_precision(tantivy::schema::DatePrecision::Milliseconds);
+    schema_builder.add_date_field("scraped_at", date_field_opts);
     let schema = schema_builder.build();
 
     let index_dir = tantivy::directory::MmapDirectory::open("./index").unwrap();

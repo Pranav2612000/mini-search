@@ -1,7 +1,7 @@
-use std::sync::{Arc, Mutex};
+use std::{sync::{Arc, Mutex}, time::{SystemTime, UNIX_EPOCH}};
 
 use anyhow::{Error, anyhow};
-use tantivy::{collector::TopDocs, query::QueryParser, Document, IndexReader, IndexWriter};
+use tantivy::{collector::TopDocs, query::QueryParser, DateTime, Document, IndexReader, IndexWriter};
 use url::Url;
 use voyager::{Collector, Crawler, Response, Scraper};
 
@@ -17,6 +17,13 @@ pub struct DocCollector {
   pub schema: tantivy::schema::Schema,
   pub extractors: Arc<dashmap::DashMap<String, DocExtractor>>,
   pub counter: Arc<dashmap::DashMap<String, i32>>,
+}
+
+fn get_epoch_ms() -> u128 {
+  SystemTime::now()
+      .duration_since(UNIX_EPOCH)
+      .unwrap()
+      .as_millis()
 }
 
 // Return pure url with hash fragments and query params removed
@@ -84,6 +91,7 @@ impl Scraper for DocCollector {
       doc.add_text(self.schema.get_field("domain").unwrap(), domain);
       doc.add_text(self.schema.get_field("headings").unwrap(), 
       content.headings.join("\n"));
+      doc.add_date(self.schema.get_field("scraped_at").unwrap(), DateTime::from_timestamp_millis(get_epoch_ms() as i64));
 
       self.index_writer.lock().unwrap().add_document(doc)?;
       self.index_writer.lock().unwrap().commit().unwrap();
