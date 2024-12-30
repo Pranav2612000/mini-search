@@ -190,11 +190,11 @@ pub async fn start_indexing() {
     schema_builder.add_text_field("api_items", tantivy::schema::TEXT | tantivy::schema::STORED);
     let schema = schema_builder.build();
 
-    let index_dir = tantivy::directory::MmapDirectory::open("../../index").unwrap();
+    let index_dir = tantivy::directory::MmapDirectory::open("./index").unwrap();
     let index = if tantivy::Index::exists(&index_dir).unwrap() {
       tantivy::Index::open(index_dir).unwrap()
     } else {
-      tantivy::Index::create_in_dir("../../index", schema.clone()).unwrap()
+      tantivy::Index::create_in_dir("./index", schema.clone()).unwrap()
     };
     let index_writer = index.writer(50_000_000).unwrap();
     let index_reader = index.reader().unwrap();

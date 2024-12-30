@@ -1,3 +1,9 @@
+[build]
 assets = [
-  "index/*"
+  "index/*",
+]
+
+[deploy]
+include = [
+  "index/*",
 ]
