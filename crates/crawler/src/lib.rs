@@ -8,6 +8,175 @@ use doc_collector::DocCollector;
 use voyager::{Collector, CrawlerConfig};
 use futures::StreamExt;
 
+const SITES: [&str; 166] = [
+  "angular.io",
+  "api.drupal.org",
+  "api.haxe.org",
+  "api.qunitjs.com",
+  "babeljs.io",
+  "backbonejs.org",
+  "bazel.build",
+  "bluebirdjs.com",
+  "bower.io",
+  "cfdocs.org",
+  "clojure.org",
+  "clojuredocs.org",
+  "codecept.io",
+  "codeception.com",
+  "codeigniter.com",
+  "coffeescript.org",
+  "cran.r-project.org",
+  "crystal-lang.org",
+  "forum.crystal-lang.org",
+  "css-tricks.com",
+  "dart.dev",
+  "dev.mysql.com",
+  "developer.apple.com",
+  "developer.mozilla.org",
+  "developer.wordpress.org",
+  "doc.deno.land",
+  "doc.rust-lang.org",
+  "docs.astro.build",
+  "docs.aws.amazon.com",
+  "docs.brew.sh",
+  "docs.chef.io",
+  "docs.cypress.io",
+  "docs.influxdata.com",
+  "docs.julialang.org",
+  "docs.microsoft.com",
+  "docs.npmjs.com",
+  "docs.oracle.com",
+  "docs.phalconphp.com",
+  "docs.python.org",
+  "docs.rs",
+  "docs.ruby-lang.org",
+  "docs.saltproject.io",
+  "docs.wagtail.org",
+  "doctrine-project.org",
+  "docwiki.embarcadero.com",
+  "eigen.tuxfamily.org",
+  "elixir-lang.org",
+  "elm-lang.org",
+  "en.cppreference.com",
+  "enzymejs.github.io",
+  "erights.org",
+  "erlang.org",
+  "esbuild.github.io",
+  "eslint.org",
+  "expressjs.com",
+  "fastapi.tiangolo.com",
+  "flow.org",
+  "fortran90.org",
+  "fsharp.org",
+  "getbootstrap.com",
+  "getcomposer.org",
+  "git-scm.com",
+  "gnu.org",
+  "gnucobol.sourceforge.io",
+  "go.dev",
+  "golang.org",
+  "graphite.readthedocs.io",
+  "groovy-lang.org",
+  "gruntjs.com",
+  "handlebarsjs.com",
+  "haskell.org",
+  "hex.pm",
+  "hexdocs.pm",
+  "httpd.apache.org",
+  "i3wm.org",
+  "jasmine.github.io",
+  "javascript.info",
+  "jekyllrb.com",
+  "jsdoc.app",
+  "julialang.org",
+  "knockoutjs.com",
+  "kotlinlang.org",
+  "laravel.com",
+  "latexref.xyz",
+  "learn.microsoft.com",
+  "lesscss.org",
+  "love2d.org",
+  "lua.org",
+  "man7.org",
+  "mariadb.com",
+  "mochajs.org",
+  "modernizr.com",
+  "momentjs.com",
+  "mongoosejs.com",
+  "next.router.vuejs.org",
+  "next.vuex.vuejs.org",
+  "nginx.org",
+  "nim-lang.org",
+  "nixos.org",
+  "nodejs.org",
+  "npmjs.com",
+  "ocaml.org",
+  "odin-lang.org",
+  "openjdk.java.net",
+  "opentsdb.net",
+  "perldoc.perl.org",
+  "php.net",
+  "playwright.dev",
+  "pointclouds.org",
+  "postgresql.org",
+  "prettier.io",
+  "pugjs.org",
+  "pydata.org",
+  "pytorch.org",
+  "qt.io",
+  "r-project.org",
+  "react-bootstrap.github.io",
+  "reactivex.io",
+  "reactjs.org",
+  "reactnative.dev",
+  "reactrouterdotcom.fly.dev",
+  "readthedocs.io",
+  "readthedocs.org",
+  "redis.io",
+  "redux.js.org",
+  "requirejs.org",
+  "rethinkdb.com",
+  "ruby-doc.org",
+  "ruby-lang.org",
+  "rust-lang.org",
+  "rxjs.dev",
+  "sass-lang.com",
+  "scala-lang.org",
+  "scikit-image.org",
+  "scikit-learn.org",
+  "spring.io",
+  "sqlite.org",
+  "stdlib.ponylang.io",
+  "superuser.com",
+  "svelte.dev",
+  "swift.org",
+  "tailwindcss.com",
+  "twig.symfony.com",
+  "typescriptlang.org",
+  "underscorejs.org",
+  "vitejs.dev",
+  "vitest.dev",
+  "vuejs.org",
+  "vueuse.org",
+  "webpack.js.org",
+  "wiki.archlinux.org",
+  "www.chaijs.com",
+  "www.electronjs.org",
+  "www.gnu.org",
+  "www.hammerspoon.org",
+  "www.khronos.org",
+  "www.lua.org",
+  "www.php.net/manual/en/",
+  "www.pygame.org",
+  "www.rubydoc.info",
+  "www.statsmodels.org",
+  "www.tcl.tk",
+  "www.terraform.io",
+  "www.vagrantup.com",
+  "www.yiiframework.com",
+  "yarnpkg.com"
+];
+
 pub async fn start_indexing() {
     println!("Starting indexing...");
     let mut schema_builder = tantivy::schema::Schema::builder();
@@ -29,10 +198,7 @@ pub async fn start_indexing() {
     let mut index_writer = index.writer(50_000_000).unwrap();
 
     let config = CrawlerConfig::default()
-      .allow_domains(vec![
-          "docs.rs",
-          // "doc.rust-lang.org",
-      ])
+      .allow_domains(SITES.to_vec())
       .respect_robots_txt()
       .max_concurrent_requests(10);
 
@@ -45,10 +211,12 @@ pub async fn start_indexing() {
 
     let mut collector = Collector::new(doc_collector.clone(), config);
 
-    collector.crawler_mut().visit_with_state(
-      "https://docs.rs",
-      ()
-    );
+    for site in SITES.iter() {
+      collector.crawler_mut().visit_with_state(
+        &format!("https://{}", site),
+        ()
+      );
+    }
 
     while let Some(output) = collector.next().await {
       if let Ok(post) = output {
@@ -57,4 +225,5 @@ pub async fn start_indexing() {
     };
 
     doc_collector.commit();
+    println!("Indexing complete!");
 }

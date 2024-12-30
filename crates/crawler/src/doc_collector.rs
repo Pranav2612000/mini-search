@@ -7,7 +7,7 @@ use voyager::{Collector, Crawler, Response, Scraper};
 
 use crate::{doc_extractor::DocExtractor, extracted_content::ExtractedContent};
 
-const NUM_PAGES_PER_SITE: i32 = 10;
+const NUM_PAGES_PER_SITE: i32 = 100;
 
 #[derive(Clone)]
 pub struct DocCollector {
