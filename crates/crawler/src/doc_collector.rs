@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 
 use anyhow::{Error, anyhow};
-use tantivy::{collector::{FilterCollector, TopDocs}, query::{Query, QueryParser}, Document, IndexReader, IndexWriter};
+use tantivy::{collector::TopDocs, query::QueryParser, Document, IndexReader, IndexWriter};
 use url::Url;
 use voyager::{Collector, Crawler, Response, Scraper};
 
@@ -84,10 +84,6 @@ impl Scraper for DocCollector {
       doc.add_text(self.schema.get_field("domain").unwrap(), domain);
       doc.add_text(self.schema.get_field("headings").unwrap(), 
       content.headings.join("\n"));
-      doc.add_text(self.schema.get_field("code_blocks").unwrap(), 
-      content.code_blocks.join("\n"));
-      doc.add_text(self.schema.get_field("api_items").unwrap(), 
-      content.api_items.join("\n"));
 
       self.index_writer.lock().unwrap().add_document(doc)?;
       self.index_writer.lock().unwrap().commit().unwrap();

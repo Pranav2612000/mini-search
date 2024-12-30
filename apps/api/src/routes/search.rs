@@ -13,7 +13,6 @@ pub struct SearchResult {
     title: String,
     url: String,
     snippet: String,
-    api_items: Vec<String>,
     score: f32,
 }
 
@@ -45,7 +44,6 @@ pub async fn search(
             title: r.title,
             url: r.url,
             snippet: r.content_snippet,
-            api_items: r.api_items,
             score: r.score,
         })
         .collect(),

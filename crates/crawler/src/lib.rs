@@ -186,8 +186,7 @@ pub async fn start_indexing() {
     schema_builder.add_text_field("url", tantivy::schema::STORED | tantivy::schema::TEXT);
     schema_builder.add_text_field("domain", tantivy::schema::STORED);
     schema_builder.add_text_field("headings", tantivy::schema::TEXT | tantivy::schema::STORED);
-    schema_builder.add_text_field("code_blocks", tantivy::schema::TEXT | tantivy::schema::STORED);
-    schema_builder.add_text_field("api_items", tantivy::schema::TEXT | tantivy::schema::STORED);
+    
     let schema = schema_builder.build();
 
     let index_dir = tantivy::directory::MmapDirectory::open("./index").unwrap();

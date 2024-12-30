@@ -7,8 +7,6 @@ struct SearchFields {
   url: Field,
   domain: Field,
   headings: Field,
-  code_blocks: Field,
-  api_items: Field,
 }
 
 pub struct DocSearcher {
@@ -24,7 +22,6 @@ pub struct SearchResult {
     pub url: String,
     pub content_snippet: String,
     pub score: Score,
-    pub api_items: Vec<String>,
 }
 
 const CONTEXT_SIZE:usize = 100;
@@ -71,22 +68,16 @@ impl DocSearcher {
       url: schema.get_field("url").unwrap(),
       domain: schema.get_field("domain").unwrap(),
       headings: schema.get_field("headings").unwrap(),
-      code_blocks: schema.get_field("code_blocks").unwrap(),
-      api_items: schema.get_field("api_items").unwrap(),
     };
 
     let mut query_parser = QueryParser::for_index(&index, vec![
       fields.title,
       fields.content,
       fields.headings,
-      fields.code_blocks,
-      fields.api_items,
     ]);
 
     query_parser.set_field_boost(fields.title, 3.0);
     query_parser.set_field_boost(fields.headings, 2.0);
-    query_parser.set_field_boost(fields.api_items, 2.5);
-    query_parser.set_field_boost(fields.code_blocks, 2.0);
 
     Ok(Self {
       index,
@@ -132,10 +123,6 @@ impl DocSearcher {
           query_str,
         ),
         score,
-        api_items: doc.get_first(self.fields.api_items)
-        .and_then(|f| f.as_text())
-        .map(|text| text.split('\n').map(String::from).collect())
-        .unwrap_or_default(),
       };
 
       results.push(result);

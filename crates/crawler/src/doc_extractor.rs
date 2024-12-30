@@ -29,26 +29,6 @@ impl DocExtractor {
       title: html.select(&voyager::scraper::Selector::parse("h1").unwrap()).map(|e| e.text().collect::<Vec<_>>().join("")).collect::<String>(),
       content: html.select(&voyager::scraper::Selector::parse("body").unwrap()).map(|e| e.text().collect()).collect(),
       headings: html.select(&voyager::scraper::Selector::parse("h1, h2, h3").unwrap()).map(|e| e.text().collect()).collect(),
-      code_blocks: html.select(&voyager::scraper::Selector::parse("pre, code").unwrap()).map(|e| e.text().collect()).collect(),
-      api_items: vec![],
     })
   }
-
-  /*
-  fn extract_generic(&self, page: Page) -> Result<ExtractedContent, Error> {
-    let title = page.select("h1").text();
-    let content = page.content().unwrap_or_default();
-    let headings = page.headings().unwrap_or_default();
-    let code_blocks = page.code_blocks().unwrap_or_default();
-    let api_items = page.api_items().unwrap_or_default();
-
-    Ok(ExtractedContent {
-      title,
-      content,
-      headings,
-      code_blocks,
-      api_items,
-    })
-  }
-  */
 }
