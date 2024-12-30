@@ -6,6 +6,7 @@ use std::sync::{Arc, Mutex};
 
 use doc_collector::DocCollector;
 use voyager::{Collector, CrawlerConfig};
+use tantivy::query::QueryParser;
 use futures::StreamExt;
 
 const SITES: [&str; 166] = [
@@ -182,7 +183,7 @@ pub async fn start_indexing() {
     let mut schema_builder = tantivy::schema::Schema::builder();
     schema_builder.add_text_field("title", tantivy::schema::TEXT | tantivy::schema::STORED);
     schema_builder.add_text_field("content", tantivy::schema::TEXT | tantivy::schema::STORED);
-    schema_builder.add_text_field("url", tantivy::schema::STORED);
+    schema_builder.add_text_field("url", tantivy::schema::STORED | tantivy::schema::TEXT);
     schema_builder.add_text_field("domain", tantivy::schema::STORED);
     schema_builder.add_text_field("headings", tantivy::schema::TEXT | tantivy::schema::STORED);
     schema_builder.add_text_field("code_blocks", tantivy::schema::TEXT | tantivy::schema::STORED);
@@ -195,7 +196,8 @@ pub async fn start_indexing() {
     } else {
       tantivy::Index::create_in_dir("../../index", schema.clone()).unwrap()
     };
-    let mut index_writer = index.writer(50_000_000).unwrap();
+    let index_writer = index.writer(50_000_000).unwrap();
+    let index_reader = index.reader().unwrap();
 
     let config = CrawlerConfig::default()
       .allow_domains(SITES.to_vec())
@@ -204,6 +206,10 @@ pub async fn start_indexing() {
 
     let mut doc_collector = DocCollector {
       index_writer: Arc::new(Mutex::new(index_writer)),
+      index_reader: Arc::new(index_reader),
+      url_query_parser: Arc::new(
+        QueryParser::for_index(&index, vec![schema.get_field("url").unwrap()])
+      ),
       schema,
       extractors: Arc::new(dashmap::DashMap::new()),
       counter: Arc::new(dashmap::DashMap::new()),
