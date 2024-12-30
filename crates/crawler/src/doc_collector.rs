@@ -19,7 +19,7 @@ pub struct DocCollector {
 
 impl DocCollector {
   pub fn commit(&mut self) {
-    self.index_writer.lock().unwrap().commit();
+    self.index_writer.lock().unwrap().commit().unwrap();
   }
 }
 
@@ -61,6 +61,7 @@ impl Scraper for DocCollector {
       content.api_items.join("\n"));
 
       self.index_writer.lock().unwrap().add_document(doc)?;
+      self.index_writer.lock().unwrap().commit().unwrap();
 
       let links = html.select(&voyager::scraper::Selector::parse("a").unwrap())
         .map(|e| e.value().attr("href").unwrap_or_default())
