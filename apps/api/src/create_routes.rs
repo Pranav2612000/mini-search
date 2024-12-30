@@ -1,7 +1,7 @@
 use std::vec;
 
 use axum::{routing::{get, post}, Router};
-use hyper::Method;
+use axum::http::Method;
 use routes::health_check::health_check;
 use routes::trigger_indexing::trigger_indexing;
 use routes::search::search;
@@ -24,6 +24,6 @@ pub fn create_router() -> Router {
       CorsLayer::new()
         .allow_origin(tower_http::cors::Any)
         .allow_methods(vec![Method::GET, Method::POST, Method::OPTIONS])
-        .allow_headers(vec![hyper::header::CONTENT_TYPE]),
-    )
+        .allow_headers(vec![axum::http::header::CONTENT_TYPE])
+    ) 
 }
