@@ -34,7 +34,7 @@ pub async fn search(
     return Err(ApiError::QueryError("Query cannot be empty".to_string()));
   }
 
-  let searcher = searcher::DocSearcher::new("../../index".to_string()).unwrap();
+  let searcher = searcher::DocSearcher::new("./index".to_string()).unwrap();
   let results = searcher.search(params.q.as_str(), 10).unwrap();
 
   let response = SearchResponse {

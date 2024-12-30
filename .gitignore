@@ -1,3 +1,6 @@
 
 target/**
 index/**
+/target
+.shuttle*
+Secrets*.toml
