@@ -2,11 +2,11 @@ mod doc_extractor;
 mod extracted_content;
 mod doc_collector;
 
-use std::sync::{Arc, Mutex};
+use std::{sync::{Arc, Mutex}, time::Duration};
 
 use doc_collector::DocCollector;
-use voyager::{Collector, CrawlerConfig};
 use tantivy::query::QueryParser;
+use voyager::{Collector, CrawlerConfig, RequestDelay};
 use futures::StreamExt;
 
 const SITES: [&str; 166] = [
@@ -200,7 +200,11 @@ pub async fn start_indexing() {
     let index_reader = index.reader().unwrap();
 
     let config = CrawlerConfig::default()
-      .allow_domains(SITES.to_vec())
+      .allow_domains_with_delay(
+        SITES.iter().map(|site| {
+          (site.to_string(), RequestDelay::Random { min: Duration::from_millis(500), max: Duration::from_millis(2000) })
+        })
+      )
       .respect_robots_txt()
       .max_concurrent_requests(10);
 
@@ -217,19 +221,26 @@ pub async fn start_indexing() {
 
     let mut collector = Collector::new(doc_collector.clone(), config);
 
-    for site in SITES.iter() {
-      collector.crawler_mut().visit_with_state(
-        &format!("https://{}", site),
-        ()
-      );
+    for curr_chunk_sites in SITES.chunks(1) {
+      println!("Indexing sites: {:?}", curr_chunk_sites);
+      for site in curr_chunk_sites {
+        println!("Site: {}", site);
+        collector.crawler_mut().visit_with_state(
+          &format!("https://{}", site),
+          ()
+        );
+      }
+      println!("Visiting sites...");
+
+      while let Some(output) = collector.next().await {
+        if let Ok(post) = output {
+          // println!("{:?}", post.headings);
+        }
+      };
+
+      doc_collector.commit();
+      println!("Completed indexing sites: {:?}", curr_chunk_sites);
     }
 
-    while let Some(output) = collector.next().await {
-      if let Ok(post) = output {
-        println!("{:?}", post.headings);
-      }
-    };
-
-    doc_collector.commit();
     println!("Indexing complete!");
 }
