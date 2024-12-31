@@ -17,7 +17,9 @@ pub async fn start_indexing() {
     schema_builder.add_text_field("content", tantivy::schema::TEXT | tantivy::schema::STORED);
     schema_builder.add_text_field("url", tantivy::schema::STORED | tantivy::schema::TEXT);
     schema_builder.add_bytes_field("url_id", tantivy::schema::STORED | tantivy::schema::INDEXED);
-    schema_builder.add_text_field("domain", tantivy::schema::STORED);
+
+    // TODO: Use a facet for this field
+    schema_builder.add_text_field("domain", tantivy::schema::STORED | tantivy::schema::TEXT);
     schema_builder.add_text_field("headings", tantivy::schema::TEXT | tantivy::schema::STORED);
     
     let date_field_opts = DateOptions::from(INDEXED).set_stored().set_precision(tantivy::schema::DatePrecision::Milliseconds);

@@ -5,6 +5,7 @@ use axum::http::Method;
 use routes::health_check::health_check;
 use routes::trigger_indexing::trigger_indexing;
 use routes::search::search;
+use routes::pages_per_site::pages_per_site;
 use tower_http::cors::CorsLayer;
 
 use crate::routes;
@@ -20,6 +21,7 @@ pub fn create_router() -> Router {
     .route("/api/health", get(health_check))
     .route("/api/index/trigger", post(trigger_indexing))
     .route("/api/search", get(search))
+    .route("/api/analytics", get(pages_per_site))
     .layer(
       CorsLayer::new()
         .allow_origin(tower_http::cors::Any)

@@ -1,5 +1,6 @@
+use config::SITES;
 use fuzzy_matcher::FuzzyMatcher;
-use tantivy::{aggregation::agg_result::AggregationResults, collector::{MultiCollector, TopDocs}, query::{self, QueryParser}, schema::{Field, Schema}, Index, Score};
+use tantivy::{aggregation::agg_result::AggregationResults, collector::{Count, MultiCollector, TopDocs}, query::{self, QueryParser}, schema::{Field, Schema}, Index, Score};
 
 struct SearchFields {
   title: Field,
@@ -95,7 +96,6 @@ impl DocSearcher {
     let searcher = reader.searcher();
 
     let query = self.query_parser.parse_query(query_str)?;
-    println!("Query {:?}", query);
 
     let top_docs = TopDocs::with_limit(limit);
     let mut multi_collector = MultiCollector::new();
@@ -106,7 +106,6 @@ impl DocSearcher {
     let mut search_results = searcher.search(&query, &multi_collector)?;
     let top_docs = top_docs_handle.extract(&mut search_results);
 
-    println!("top docs {:?}", top_docs);
     for (score, doc_address) in top_docs {
       let doc = searcher.doc(doc_address)?;
 
@@ -133,5 +132,25 @@ impl DocSearcher {
     };
 
     Ok(results)
+  }
+
+  // IMPROV: Use facets
+  pub fn get_pages_per_site(&self) -> tantivy::Result<Vec<(&str, usize)>> {
+    let reader = self.index.reader()?;
+    let searcher = reader.searcher();
+    let query_parser = QueryParser::for_index(
+      &self.index,
+      vec![self.schema.get_field("domain").unwrap()]
+    );
+
+    let mut result = Vec::new();
+    for site in SITES {
+      let query = query_parser.parse_query("docs.rs").unwrap();
+      let count = searcher.search(&query, &Count)?;
+
+      result.push((site, count));
+    }
+
+    return Ok(result);
   }
 }

@@ -3457,6 +3457,7 @@ dependencies = [
 name = "searcher"
 version = "0.1.0"
 dependencies = [
+ "config",
  "fuzzy-matcher",
  "once_cell",
  "tantivy",
