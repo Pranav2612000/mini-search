@@ -5,7 +5,7 @@ use super::ApiError;
 
 #[derive(Debug, Deserialize)]
 pub struct ScrapedUrlsQuery{
-    url: Option<String>,
+    domain: Option<String>,
     limit: Option<usize>,
     offset: Option<usize>,
 }
@@ -17,7 +17,7 @@ pub async fn scraped_urls(
 
   let limit = params.limit.unwrap_or_else(|| {10});
   let offset = params.offset.unwrap_or_else(|| {0});
-  let results = searcher.get_crawled_urls(params.url, limit, offset).unwrap();
+  let results = searcher.get_crawled_urls(params.domain, limit, offset).unwrap();
 
   return Ok(Json(results));
 }
