@@ -145,7 +145,7 @@ impl DocSearcher {
 
     let mut result = Vec::new();
     for site in SITES {
-      let query = query_parser.parse_query("docs.rs").unwrap();
+      let query = query_parser.parse_query(site).unwrap();
       let count = searcher.search(&query, &Count)?;
 
       result.push((site, count));
