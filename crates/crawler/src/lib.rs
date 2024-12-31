@@ -184,6 +184,7 @@ pub async fn start_indexing() {
     schema_builder.add_text_field("title", tantivy::schema::TEXT | tantivy::schema::STORED);
     schema_builder.add_text_field("content", tantivy::schema::TEXT | tantivy::schema::STORED);
     schema_builder.add_text_field("url", tantivy::schema::STORED | tantivy::schema::TEXT);
+    schema_builder.add_bytes_field("url_id", tantivy::schema::STORED | tantivy::schema::INDEXED);
     schema_builder.add_text_field("domain", tantivy::schema::STORED);
     schema_builder.add_text_field("headings", tantivy::schema::TEXT | tantivy::schema::STORED);
     
@@ -197,8 +198,6 @@ pub async fn start_indexing() {
     } else {
       tantivy::Index::create_in_dir("./index", schema.clone()).unwrap()
     };
-    let index_writer = index.writer(50_000_000).unwrap();
-    let index_reader = index.reader().unwrap();
 
     let config = CrawlerConfig::default()
       .allow_domains_with_delay(
@@ -210,11 +209,7 @@ pub async fn start_indexing() {
       .max_concurrent_requests(10);
 
     let mut doc_collector = DocCollector {
-      index_writer: Arc::new(Mutex::new(index_writer)),
-      index_reader: Arc::new(index_reader),
-      url_query_parser: Arc::new(
-        QueryParser::for_index(&index, vec![schema.get_field("url").unwrap()])
-      ),
+      index: Arc::new(index),
       schema,
       extractors: Arc::new(dashmap::DashMap::new()),
       counter: Arc::new(dashmap::DashMap::new()),
@@ -239,7 +234,6 @@ pub async fn start_indexing() {
         }
       };
 
-      doc_collector.commit();
       println!("Completed indexing sites: {:?}", curr_chunk_sites);
     }
 

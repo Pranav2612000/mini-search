@@ -14,6 +14,7 @@ pub struct SearchResult {
     url: String,
     snippet: String,
     score: f32,
+    scraped_at: i64,
 }
 
 #[derive(Debug, Serialize)]
@@ -45,6 +46,7 @@ pub async fn search(
             url: r.url,
             snippet: r.content_snippet,
             score: r.score,
+            scraped_at: r.scraped_at
         })
         .collect(),
     query: params.q,

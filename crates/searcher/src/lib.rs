@@ -7,6 +7,7 @@ struct SearchFields {
   url: Field,
   domain: Field,
   headings: Field,
+  scraped_at: Field,
 }
 
 pub struct DocSearcher {
@@ -22,6 +23,7 @@ pub struct SearchResult {
     pub url: String,
     pub content_snippet: String,
     pub score: Score,
+    pub scraped_at: i64,
 }
 
 const CONTEXT_SIZE:usize = 100;
@@ -68,6 +70,7 @@ impl DocSearcher {
       url: schema.get_field("url").unwrap(),
       domain: schema.get_field("domain").unwrap(),
       headings: schema.get_field("headings").unwrap(),
+      scraped_at: schema.get_field("scraped_at").unwrap(),
     };
 
     let mut query_parser = QueryParser::for_index(&index, vec![
@@ -122,6 +125,7 @@ impl DocSearcher {
           .unwrap_or_default(),
           query_str,
         ),
+        scraped_at: doc.get_first(self.fields.scraped_at).and_then(|f| f.as_date()).unwrap().into_timestamp_millis(),
         score,
       };
 
