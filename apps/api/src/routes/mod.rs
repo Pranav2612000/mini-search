@@ -5,6 +5,7 @@ pub mod health_check;
 pub mod trigger_indexing;
 pub mod search;
 pub mod pages_per_site;
+pub mod scraped_urls;
 
 // Error handling
 #[derive(Debug, thiserror::Error)]

@@ -153,4 +153,30 @@ impl DocSearcher {
 
     return Ok(result);
   }
+
+  pub fn get_crawled_urls(&self, domain: Option<String>, limit: usize, offset: usize) -> tantivy::Result<Vec<String>> {
+    let reader = self.index.reader()?;
+    let searcher = reader.searcher();
+    let query_parser = QueryParser::for_index(
+      &self.index,
+      vec![self.schema.get_field("domain").unwrap()]
+    );
+
+    let query_string = domain.unwrap_or_else(|| {"*".to_string()});
+    let query = query_parser.parse_query(&query_string).unwrap();
+
+    let top_docs_collector = TopDocs::with_limit(limit).and_offset(offset);
+    let top_docs = searcher.search(&query, &top_docs_collector).unwrap();
+
+    let mut urls = Vec::new();
+    for (_, doc_address) in top_docs {
+      let doc = searcher.doc(doc_address)?;
+
+      let url = doc.get_first(self.fields.url).and_then(|f| f.as_text()).unwrap_or_default().to_string();
+
+      urls.push(url);
+    };
+
+    Ok(urls)
+  }
 }
