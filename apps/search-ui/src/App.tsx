@@ -5,6 +5,9 @@ import {
   Route,
 } from "react-router-dom";
 import SearchPage from './pages/Search';
+import axios from 'axios';
+
+axios.defaults.baseURL = 'http://localhost:8000';
 
 function App() {
   return (
