@@ -20,11 +20,17 @@ pub struct DocSearcher {
 
 #[derive(Debug, Clone)]
 pub struct SearchResult {
-    pub title: String,
-    pub url: String,
-    pub content_snippet: String,
-    pub score: Score,
-    pub scraped_at: i64,
+  pub title: String,
+  pub url: String,
+  pub content_snippet: String,
+  pub score: Score,
+  pub scraped_at: i64,
+}
+
+#[derive(Debug, Clone)]
+pub struct GetCrawledUrlsResult {
+  pub urls: Vec<String>,
+  pub total: usize,
 }
 
 const CONTEXT_SIZE:usize = 100;
@@ -154,7 +160,7 @@ impl DocSearcher {
     return Ok(result);
   }
 
-  pub fn get_crawled_urls(&self, domain: Option<String>, limit: usize, offset: usize) -> tantivy::Result<Vec<String>> {
+  pub fn get_crawled_urls(&self, domain: Option<String>, limit: usize, offset: usize) -> tantivy::Result<GetCrawledUrlsResult> {
     let reader = self.index.reader()?;
     let searcher = reader.searcher();
     let query_parser = QueryParser::for_index(
@@ -166,7 +172,13 @@ impl DocSearcher {
     let query = query_parser.parse_query(&query_string).unwrap();
 
     let top_docs_collector = TopDocs::with_limit(limit).and_offset(offset);
-    let top_docs = searcher.search(&query, &top_docs_collector).unwrap();
+    let mut multi_collector = MultiCollector::new();
+    let top_docs_handle = multi_collector.add_collector(top_docs_collector);
+    let count_handle = multi_collector.add_collector(Count);
+
+    let mut multifruits= searcher.search(&query, &multi_collector).unwrap();
+    let top_docs = top_docs_handle.extract(&mut multifruits);
+    let count = count_handle.extract(&mut multifruits);
 
     let mut urls = Vec::new();
     for (_, doc_address) in top_docs {
@@ -177,6 +189,9 @@ impl DocSearcher {
       urls.push(url);
     };
 
-    Ok(urls)
+    Ok(GetCrawledUrlsResult {
+      urls,
+      total: count,
+    })
   }
 }

@@ -2,26 +2,32 @@ import { useEffect, useState } from "react";
 import fetchCrawledSites from "../api/fetchCrawledSites";
 import { useSearchParams } from "react-router-dom";
 
+const DEFAULT_LIMIT = 10;
+const DEFAULT_OFFSET = 0;
+
 const CrawledSitesList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(true);
   const [sites, setSites] = useState<string[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+
+  const domain = searchParams.get("domain");
+  const limit = searchParams.get("limit");
+  const offset = searchParams.get("offset");
 
   useEffect(() => {
     const getCrawledSites = async () => {
-      const domain = searchParams.get("domain");
-      const limit = searchParams.get("limit");
-      const offset = searchParams.get("offset");
-      const fetchedSites = await fetchCrawledSites(
+      const result = await fetchCrawledSites(
         domain || undefined,
         limit ? Number(limit) : undefined,
         offset ? Number(offset) : undefined,
       );
-      setSites(fetchedSites);
+      setSites(result.urls);
+      setTotalCount(result.total);
       setIsLoading(false);
     };
     getCrawledSites();
-  }, [searchParams]);
+  }, [domain, limit, offset]);
   return (
     <>
       <h1>Crawled Sites</h1>
@@ -37,11 +43,11 @@ const CrawledSitesList = () => {
       {!isLoading && sites.length === 0 && <p>No sites found</p>}
       {!isLoading && (
         <>
-          {searchParams.get("offset") && (
+          {offset && offset != "0" && (
             <button onClick={() => {
               setSearchParams((prevParams) => {
                 const offset = Number(prevParams.get("offset"));
-                const limit = prevParams.get("limit") ? Number(prevParams.get("limit")) : 10;
+                const limit = prevParams.get("limit") ? Number(prevParams.get("limit")) : DEFAULT_LIMIT;
                 const newOffset = offset - limit < 0 ? 0 : offset - limit;
 
                 prevParams.set("offset", newOffset.toString());
@@ -51,17 +57,19 @@ const CrawledSitesList = () => {
               Prev
             </button>
           )}
-          <button onClick={() => {
-            setSearchParams((prevParams) => {
-              const offset = prevParams.get("offset") ? Number(prevParams.get("offset")) : 0;
-              const limit = prevParams.get("limit") ? Number(prevParams.get("limit")) : 10;
+          {((Number(offset || 0) + Number(limit || DEFAULT_LIMIT)) < totalCount) && (
+            <button onClick={() => {
+              setSearchParams((prevParams) => {
+                const offset = prevParams.get("offset") ? Number(prevParams.get("offset")) : DEFAULT_OFFSET;
+                const limit = prevParams.get("limit") ? Number(prevParams.get("limit")) : DEFAULT_LIMIT;
 
-              prevParams.set("offset", (offset + limit).toString());
-              return prevParams;
-            })
-          }}>
-            Next
-          </button>
+                prevParams.set("offset", (offset + limit).toString());
+                return prevParams;
+              })
+            }}>
+              Next
+            </button>
+          )}
         </>
       )}
     </>
