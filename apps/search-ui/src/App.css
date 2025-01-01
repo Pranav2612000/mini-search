@@ -19,6 +19,14 @@ button {
   border: 1px solid black;
 }
 
+table {
+  border-collapse: collapse;
+}
+
+table, th, td {
+  border: 1px solid;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -101,4 +109,9 @@ button {
 .crawled-sites-list-container {
   width: 512px;
   text-align: left;
+}
+
+.domain-cell {
+  text-align: left;
+  padding-left: 1rem;
 }

@@ -22,13 +22,13 @@ const Analytics = () => {
       {!isLoading && analyticsData.length > 0 && (
         <table>
           <tr>
-            <th>Domain</th>
+            <th className="domain-cell">Domain</th>
             <th>No of pages scraped</th>
           </tr>
           {analyticsData.map((entry) => (
             <>
               <tr>
-                <td>
+                <td className="domain-cell">
                   <a href={`/analytics/crawled_sites?domain=${entry.domain}`}>
                     {entry.domain}
                   </a>
