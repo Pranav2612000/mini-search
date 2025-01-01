@@ -35,7 +35,7 @@ const CrawledSitesList = () => {
       {(
         <div className="pagination-btn-container">
           {offset && offset != "0" && (
-            <button className="prev-btn" onClick={() => {
+            <a className="prev-btn" onClick={() => {
               setSearchParams((prevParams) => {
                 const offset = Number(prevParams.get("offset"));
                 const limit = prevParams.get("limit") ? Number(prevParams.get("limit")) : DEFAULT_LIMIT;
@@ -46,10 +46,10 @@ const CrawledSitesList = () => {
               })
             }}>
               Prev
-            </button>
+            </a>
           )}
           {((Number(offset || 0) + Number(limit || DEFAULT_LIMIT)) < totalCount) && (
-            <button className="next-btn" onClick={() => {
+            <a className="next-btn" onClick={() => {
               setSearchParams((prevParams) => {
                 const offset = prevParams.get("offset") ? Number(prevParams.get("offset")) : DEFAULT_OFFSET;
                 const limit = prevParams.get("limit") ? Number(prevParams.get("limit")) : DEFAULT_LIMIT;
@@ -59,7 +59,7 @@ const CrawledSitesList = () => {
               })
             }}>
               Next
-            </button>
+            </a>
           )}
         </div>
       )}
