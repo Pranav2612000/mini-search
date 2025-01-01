@@ -17,6 +17,7 @@ const CrawledSitesList = () => {
 
   useEffect(() => {
     const getCrawledSites = async () => {
+      setIsLoading(true);
       const result = await fetchCrawledSites(
         domain || undefined,
         limit ? Number(limit) : undefined,
@@ -31,20 +32,10 @@ const CrawledSitesList = () => {
   return (
     <>
       <h1>Crawled Sites</h1>
-      {isLoading && <p>Loading...</p>}
-      {!isLoading && sites.length > 0 && (
-        <ul>
-          {sites.map((site) => (
-            <li>{site}</li>
-          ))}
-
-        </ul>
-      )}
-      {!isLoading && sites.length === 0 && <p>No sites found</p>}
-      {!isLoading && (
-        <>
+      {(
+        <div className="pagination-btn-container">
           {offset && offset != "0" && (
-            <button onClick={() => {
+            <button className="prev-btn" onClick={() => {
               setSearchParams((prevParams) => {
                 const offset = Number(prevParams.get("offset"));
                 const limit = prevParams.get("limit") ? Number(prevParams.get("limit")) : DEFAULT_LIMIT;
@@ -58,7 +49,7 @@ const CrawledSitesList = () => {
             </button>
           )}
           {((Number(offset || 0) + Number(limit || DEFAULT_LIMIT)) < totalCount) && (
-            <button onClick={() => {
+            <button className="next-btn" onClick={() => {
               setSearchParams((prevParams) => {
                 const offset = prevParams.get("offset") ? Number(prevParams.get("offset")) : DEFAULT_OFFSET;
                 const limit = prevParams.get("limit") ? Number(prevParams.get("limit")) : DEFAULT_LIMIT;
@@ -70,8 +61,29 @@ const CrawledSitesList = () => {
               Next
             </button>
           )}
-        </>
+        </div>
       )}
+      {isLoading && <p>Loading...</p>}
+      {!isLoading && sites.length > 0 && (
+        <ul className="crawled-sites-list-container">
+          {sites.map((site) => (
+            <li>
+              <a href={site} target="_blank">
+                {site}
+              </a>
+            </li>
+          ))}
+
+        </ul>
+      )}
+      {!isLoading && sites.length > 0 &&
+        <p className="crawled-sites-list-container">
+          Showing{' '} 
+            {offset}-{Number(offset || DEFAULT_OFFSET) + Number(limit || DEFAULT_LIMIT)}
+          {' '}of {totalCount} results
+        </p>
+      }
+      {!isLoading && sites.length === 0 && <p>No sites found</p>}
     </>
   )
 };

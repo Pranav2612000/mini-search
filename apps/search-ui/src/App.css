@@ -6,6 +6,19 @@
   height: 100vh;
 }
 
+li {
+  list-style-position: inside;
+  text-align: left;
+}
+
+ul {
+  padding-left: unset;
+}
+
+button {
+  border: 1px solid black;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -67,4 +80,25 @@
 
 .search-centered {
   margin-top: 30vh;
+}
+
+.pagination-btn-container {
+  width: 512px;
+  height: 40px;
+  position: relative;
+}
+
+.pagination-btn-container .next-btn {
+  position: absolute;
+  right: 0px;
+}
+
+.pagination-btn-container .prev-btn {
+  position: absolute;
+  left: 0px;
+}
+
+.crawled-sites-list-container {
+  width: 512px;
+  text-align: left;
 }
