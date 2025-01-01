@@ -1,7 +1,6 @@
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  text-align: center;
 
   height: 100vh;
 }
@@ -25,6 +24,11 @@ table {
 
 table, th, td {
   border: 1px solid;
+}
+
+p {
+  padding: unset;
+  margin: unset;
 }
 
 .logo {
@@ -111,7 +115,20 @@ table, th, td {
   text-align: left;
 }
 
+.crawled-sites-list-footer {
+  width: 512px;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+}
+
 .domain-cell {
   text-align: left;
   padding-left: 1rem;
+}
+
+.view-analytics-container {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
 }

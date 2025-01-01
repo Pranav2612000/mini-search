@@ -18,6 +18,7 @@ const Analytics = () => {
   return (
     <>
       <h1>Analytics</h1>
+      <a href="/">Back to search</a>
       {isLoading && <p>Loading...</p>}
       {!isLoading && analyticsData.length > 0 && (
         <table>

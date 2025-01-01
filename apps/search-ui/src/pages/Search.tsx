@@ -50,6 +50,9 @@ const SearchPage = () => {
           )}
         </div>
       )}
+      <div className="view-analytics-container">
+        <a href='/analytics'>View Analytics</a>
+      </div>
     </div>
   )
 };

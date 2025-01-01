@@ -77,11 +77,20 @@ const CrawledSitesList = () => {
         </ul>
       )}
       {!isLoading && sites.length > 0 &&
-        <p className="crawled-sites-list-container">
-          Showing{' '} 
-            {offset}-{Number(offset || DEFAULT_OFFSET) + Number(limit || DEFAULT_LIMIT)}
-          {' '}of {totalCount} results
-        </p>
+        <div className="crawled-sites-list-footer">
+          <div>
+            <p>
+              Showing{' '} 
+                {offset || DEFAULT_OFFSET}-{Number(offset || DEFAULT_OFFSET) + Number(limit || DEFAULT_LIMIT)}
+              {' '}of {totalCount} results
+            </p>
+          </div>
+          <div>
+            <a href="/">Search</a>
+              {' '} | {' '}
+            <a href="/analytics">All Sites</a>
+          </div>
+        </div>
       }
       {!isLoading && sites.length === 0 && <p>No sites found</p>}
     </>
