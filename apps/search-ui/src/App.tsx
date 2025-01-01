@@ -7,6 +7,7 @@ import {
 import SearchPage from './pages/Search';
 import axios from 'axios';
 import CrawledSitesList from './pages/CrawledSitesList';
+import Analytics from './pages/Analytics';
 
 axios.defaults.baseURL = 'http://localhost:8000';
 
@@ -16,6 +17,7 @@ function App() {
       <Router>
         <Routes>
           <Route path='/' element={<SearchPage />}/>
+          <Route path='/analytics' element={<Analytics />} />
           <Route path='/analytics/crawled_sites' element={<CrawledSitesList />} />
         </Routes>
       </Router>
