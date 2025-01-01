@@ -55,12 +55,12 @@ impl DocCollector {
       let url_id= doc.get_first(self.schema.get_field("url_id").unwrap())
         .and_then(|f| f.as_bytes()).unwrap();
       let term = Term::from_field_bytes(self.schema.get_field("url_id").unwrap(), &url_id);
-      println!("Term {:?}", term);
       let mut writer = self.index.writer(50_000_000).unwrap();
 
       // Look for a better mechanism to solve this as deleting is expensive
       writer.delete_term(term);
       writer.commit().unwrap();
+      drop(writer);
       return true;
     }
 
@@ -82,16 +82,7 @@ impl Scraper for DocCollector {
     .or_insert_with(|| DocExtractor::new(domain).unwrap())
     .clone();
 
-    let counter = self.counter.entry(domain.to_string())
-    .or_insert_with(|| 0)
-    .clone();
-
-    if counter > NUM_PAGES_PER_SITE {
-      return Ok(None);
-    }
-
     if !self.should_scrape_url(parse_url(url.as_str()).as_str()) {
-      println!("Ignoring {:?} as it has been scraped recently", url.as_str());
       return Ok(None);
     }
 
@@ -113,21 +104,44 @@ impl Scraper for DocCollector {
       let mut writer = self.index.writer(50_000_000).unwrap();
       writer.add_document(doc)?;
       writer.commit().unwrap();
+      drop(writer);
 
       let links = html.select(&voyager::scraper::Selector::parse("a").unwrap())
         .map(|e| e.value().attr("href").unwrap_or_default())
         .collect::<Vec<_>>();
+
       for link in links {
+        let mut scrape_url = None;
         if let Ok(url) = Url::parse(link) {
-          crawler.visit_with_state(url, ());
+          scrape_url = Some(url);
         }
         
-        if let Ok(url) = url.join(link) {
-          crawler.visit_with_state(url, ());
+        if scrape_url.is_none() {
+          if let Ok(url) = url.join(link) {
+            scrape_url = Some(url);
+          }
+        }
+
+        if let Some(scrape_url) = scrape_url {
+          // Before visiting the link, check if it is already scraped
+          let url = scrape_url.clone();
+          let domain = url.domain().ok_or_else(|| anyhow!("No domain found"))?;
+          let counter = self.counter.entry(domain.to_string())
+            .or_insert_with(|| 0)
+            .clone();
+
+          if counter > NUM_PAGES_PER_SITE {
+            continue;
+          }
+
+          if !self.should_scrape_url(parse_url(url.as_str()).as_str()) {
+            continue;
+          }
+
+          crawler.visit_with_state(scrape_url, ());
+          self.counter.alter(&domain.to_string(), |_, i| { i + 1 });
         }
       }
-
-      self.counter.alter(&domain.to_string(), |_, i| { i + 1 });
 
       return Ok(Some(content));
     }
