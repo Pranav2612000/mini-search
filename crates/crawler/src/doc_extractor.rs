@@ -25,8 +25,14 @@ impl DocExtractor {
     // let spider = Spider::from_website(&self.website);
     // let page = Page::bui(html, url, &spider);
     // let page = Page::new(, client)
+    let title_text_ref = html.select(&voyager::scraper::Selector::parse("title").unwrap()).map(|e| e.text().collect()).collect::<Vec<String>>();
+    let title = if let Some(txt) = title_text_ref.first() {
+      txt
+    } else {
+      ""
+    };
     Ok(ExtractedContent {
-      title: html.select(&voyager::scraper::Selector::parse("title").unwrap()).map(|e| e.text().collect::<Vec<_>>().join(" ")).collect::<String>(),
+      title: title.to_string(),
       content: html.select(&voyager::scraper::Selector::parse("body").unwrap()).map(|e| e.text().collect()).collect(),
       headings: html.select(&voyager::scraper::Selector::parse("h1, h2, h3").unwrap()).map(|e| e.text().collect()).collect(),
     })
