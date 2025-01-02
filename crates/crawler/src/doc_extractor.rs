@@ -26,7 +26,7 @@ impl DocExtractor {
     // let page = Page::bui(html, url, &spider);
     // let page = Page::new(, client)
     Ok(ExtractedContent {
-      title: html.select(&voyager::scraper::Selector::parse("h1").unwrap()).map(|e| e.text().collect::<Vec<_>>().join("")).collect::<String>(),
+      title: html.select(&voyager::scraper::Selector::parse("title").unwrap()).map(|e| e.text().collect::<Vec<_>>().join(" ")).collect::<String>(),
       content: html.select(&voyager::scraper::Selector::parse("body").unwrap()).map(|e| e.text().collect()).collect(),
       headings: html.select(&voyager::scraper::Selector::parse("h1, h2, h3").unwrap()).map(|e| e.text().collect()).collect(),
     })
