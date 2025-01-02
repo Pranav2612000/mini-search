@@ -83,7 +83,6 @@ p {
 }
 
 .search-results {
-  margin-top: 16px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -133,4 +132,13 @@ p {
   position: absolute;
   bottom: 0px;
   right: 0px;
+}
+
+.search-page {
+  text-align: center;
+  width: 512px;
+}
+
+.search-result-entry {
+  list-style-type: none;
 }
