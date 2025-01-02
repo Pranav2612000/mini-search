@@ -148,6 +148,11 @@ p {
   display: flex;
   flex-direction: column;
 }
+
+.result-content .heading {
+  color: black;
+}
+
 .scraped-at {
   color: #888;
   font-size: 12px;

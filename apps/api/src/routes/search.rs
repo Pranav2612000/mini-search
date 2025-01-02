@@ -11,6 +11,7 @@ pub struct SearchQuery {
 #[derive(Debug, Serialize)]
 pub struct SearchResult {
     title: String,
+    heading: String,
     url: String,
     snippet: String,
     score: f32,
@@ -43,6 +44,7 @@ pub async fn search(
         .into_iter()
         .map(|r| SearchResult {
             title: r.title,
+            heading: r.heading,
             url: r.url,
             snippet: r.content_snippet,
             score: r.score,

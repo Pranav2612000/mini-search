@@ -23,6 +23,7 @@ pub struct SearchResult {
   pub title: String,
   pub url: String,
   pub content_snippet: String,
+  pub heading: String,
   pub score: Score,
   pub scraped_at: i64,
 }
@@ -63,6 +64,26 @@ fn generate_snippet(text: &str, query: &str) -> String {
       // If no match found, return the beginning of the text
       let words: Vec<&str> = text.split_whitespace().take(20).collect();
       format!("{}...", words.join(" "))
+  }
+}
+
+// This is similar to generate snippet for now, but we'll change it later
+fn generate_heading(text: &str, query: &str) -> String {
+  let matcher = fuzzy_matcher::skim::SkimMatcherV2::default();
+
+  let best_heading= text
+    .split_terminator("\n")
+    .enumerate()
+    .filter_map(|(_, word)| {
+      matcher.fuzzy_match(word, query).map(|score| (word, score))
+    })
+    .max_by_key(|(_, score)| *score)
+    .map(|(word, _)| word);
+
+  if let Some(heading) = best_heading {
+    return heading.to_string();
+  } else {
+    return "".to_string();
   }
 }
 
@@ -126,6 +147,12 @@ impl DocSearcher {
         .to_string(),
         content_snippet: generate_snippet(
           doc.get_first(self.fields.content)
+          .and_then(|f| f.as_text())
+          .unwrap_or_default(),
+          query_str,
+        ),
+        heading: generate_heading(
+          doc.get_first(self.fields.headings)
           .and_then(|f| f.as_text())
           .unwrap_or_default(),
           query_str,

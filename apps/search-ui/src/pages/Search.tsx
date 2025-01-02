@@ -63,6 +63,9 @@ const SearchPage = () => {
                       {result.title}
                     </a>
                     <div className="result-content">
+                      <span className="heading">
+                        {result.heading}
+                      </span>
                       <span className="content">
                         {result.snippet}
                       </span>
