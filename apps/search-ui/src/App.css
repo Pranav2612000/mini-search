@@ -130,7 +130,7 @@ p {
 
 .view-analytics-container {
   position: absolute;
-  bottom: 0px;
+  top: 0px;
   right: 0px;
 }
 
@@ -141,4 +141,18 @@ p {
 
 .search-result-entry {
   list-style-type: none;
+  margin-bottom: 8px;
+}
+
+.result-content {
+  display: flex;
+  flex-direction: column;
+}
+.scraped-at {
+  color: #888;
+  font-size: 12px;
+}
+
+span.search-duration {
+  color: black;
 }

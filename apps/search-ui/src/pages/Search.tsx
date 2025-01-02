@@ -6,11 +6,12 @@ import { useSearchParams } from "react-router-dom";
 
 const SearchPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [searchText, setSearchText] = React.useState('');
+  const searchQuery = searchParams.get('q') || "";
+
+  const [searchText, setSearchText] = React.useState(searchQuery);
   const [isLoading, setIsLoading] = React.useState(false);
   const [searchResults, setSearchResults] = React.useState<SearchResult[]>([]);
   const [searchDuration, setSearchDuration] = React.useState(0);
-  const searchQuery = searchParams.get('q') || "";
   const isSearchCompleted = Boolean(searchQuery)
 
   const search = async (e: MouseEvent<HTMLButtonElement>) => {
@@ -61,12 +62,20 @@ const SearchPage = () => {
                     <a href={result.url}>
                       {result.title}
                     </a>
+                    <div className="result-content">
+                      <span className="content">
+                        {result.snippet}
+                      </span>
+                      <span className="scraped-at">
+                        {new Date(result.scraped_at).toDateString()}
+                      </span>
+                    </div>
                   </div>
                 </li>
               ))}
             </ul>
           )}
-          <span>Took {searchDuration}ms</span>
+          <span className="search-duration">Displayed results in {searchDuration}ms</span>
         </div>
       )}
       <div className="view-analytics-container">
