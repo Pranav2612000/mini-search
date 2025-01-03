@@ -46,3 +46,27 @@ _You may need to update the baseURL in `App.tsx` to point to your backend_
 `shuttle run`
 
 *Note: To test out an independent crates you can also navigate to the crate and run the corresponding examples*
+
+### Creating the Index
+- Ensure that the `~/index` directory exists. This is where the index is stored
+- The file `crates/config/src` contains the following config variables
+	- `SITES` - list of sites to be scanned
+	- `NUM_PAGES_PER_SITE` - number of pages to be indexed for each domain
+	- `RE_CRAWL_DURATION` - duration after which a page data will be updated and re-indexed
+- Update these values to suitable values
+- Run the `create-index` example
+`cargo run --example create_index`
+- Alternatively, you can also start the API server and call the `trigger_index` endpoint
+
+
+## Next Steps
+
+### System Improvements
+- Allow deploying the search index remotely in a distributed fashion
+- Fine tune scraper and searcher to search for documentation
+- Reduce search latency
+	- Reduce size of indexed data
+- Add more entrypoints for crawling supported sites
+
+### Code
+-   Better logging
