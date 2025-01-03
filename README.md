@@ -58,6 +58,18 @@ _You may need to update the baseURL in `App.tsx` to point to your backend_
 `cargo run --example create_index`
 - Alternatively, you can also start the API server and call the `trigger_index` endpoint
 
+### Deployment - UI
+- Build the app using the below command. This should generate the static site in the `dist` folder.
+`npm run build`
+- Deploy to firebase. _You may need to install firebase cli and update firebase config to set up a new firebase project_
+`firebase deploy`
+
+### Deployment - API
+- Install shuttle cli ( https://docs.shuttle.rs/getting-started/installation )
+- Deploy
+`shuttle deploy`
+- You'll be asked to set up a new project by shuttle
+*Shuttle has limits on the file sizes, so you'll not be able to upload a large index*
 
 ## Next Steps
 
