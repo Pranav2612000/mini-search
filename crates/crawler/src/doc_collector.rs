@@ -1,14 +1,12 @@
-use std::{sync::{Arc, Mutex}, time::{SystemTime, UNIX_EPOCH}};
+use std::{sync::Arc, time::{SystemTime, UNIX_EPOCH}};
 
 use anyhow::{Error, anyhow};
-use tantivy::{collector::TopDocs, query::QueryParser, DateTime, Document, Index, IndexReader, IndexWriter, Term};
+use config::{NUM_PAGES_PER_SITE, RE_CRAWL_DURATION};
+use tantivy::{collector::TopDocs, query::QueryParser, DateTime, Document, Index, Term};
 use url::Url;
-use voyager::{Collector, Crawler, Response, Scraper};
+use voyager::{Crawler, Response, Scraper};
 
 use crate::{doc_extractor::DocExtractor, extracted_content::ExtractedContent};
-
-const NUM_PAGES_PER_SITE: i32 = 100;
-const RE_CRAWL_DURATION: i64 = 1000 * 60 * 60 * 24; // 1 day
 
 #[derive(Clone)]
 pub struct DocCollector {

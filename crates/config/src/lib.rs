@@ -166,3 +166,6 @@ pub const SITES: [&str; 166] = [
   "www.yiiframework.com",
   "yarnpkg.com"
 ];
+
+pub const NUM_PAGES_PER_SITE: i32 = 100;
+pub const RE_CRAWL_DURATION: i64 = 1000 * 60 * 60 * 24; // 1 day
