@@ -2,6 +2,8 @@
 A simple POC search engine to learn about Search Technologies.
 https://mini-search-d9465.web.app/
 
+Video demonstration: https://www.loom.com/share/93ef6fc279c74ae1b1a13bfe4024a6a5?sid=7dbf4fff-2060-4787-8797-942a135c1fd6
+
 ## Description
 A mini search engine specifically designed for searching programming documentation using existing technologies. Uses
 - [tantivy](https://github.com/quickwit-oss/tantivy) for search,
