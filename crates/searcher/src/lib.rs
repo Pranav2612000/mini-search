@@ -40,30 +40,36 @@ const MAX_LENGTH:usize = 100;
 fn generate_snippet(text: &str, query: &str) -> String {
   let matcher = fuzzy_matcher::skim::SkimMatcherV2::default();
 
-  let best_position = text
-    .split_whitespace()
+  let best_line = text
+    .split_terminator("\n")
     .enumerate()
     .filter_map(|(i, word)| {
-      matcher.fuzzy_match(word, query).map(|score| (i, score))
+      matcher.fuzzy_indices(word, query).map(|(score, indices)| (i, score, indices))
     })
-    .max_by_key(|(_, score)| *score)
-    .map(|(pos, _)| pos);
+    .max_by_key(|(_, score, _)| *score)
+    .map(|(pos, _, indices)| (pos, indices));
 
-  if let Some(pos) = best_position {
-      let words: Vec<&str> = text.split_whitespace().collect();
-      let start = pos.saturating_sub(CONTEXT_SIZE);
-      let end = (pos + CONTEXT_SIZE).min(words.len());
-      
-      let snippet = words[start..end].join(" ");
-      if snippet.len() > MAX_LENGTH {
-          format!("{}...", &snippet[..MAX_LENGTH])
-      } else {
-          snippet
-      }
+  if let Some(pos) = best_line {
+    let lines: Vec<&str> = text.split_terminator("\n").collect();
+    let line = lines[pos.0];
+
+    if line.len() > MAX_LENGTH {
+      return format!("{}...", &line[..MAX_LENGTH]);
+    }
+
+    let start_idx = pos.1.first();
+    if start_idx.is_none() {
+      return format!("{}...", &line[..MAX_LENGTH]);
+    }
+
+    let start = start_idx.unwrap().saturating_sub(CONTEXT_SIZE);
+    let end = (pos.0 + CONTEXT_SIZE).min(line.len());
+
+    return format!("...{}...", &line[start..end]);
   } else {
-      // If no match found, return the beginning of the text
-      let words: Vec<&str> = text.split_whitespace().take(20).collect();
-      format!("{}...", words.join(" "))
+    // If no match found, return the beginning of the text
+    let words: Vec<&str> = text.split_whitespace().take(20).collect();
+    format!("{}...", words.join(" "))
   }
 }
 
