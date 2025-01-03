@@ -9,7 +9,7 @@ import axios from 'axios';
 import CrawledSitesList from './pages/CrawledSitesList';
 import Analytics from './pages/Analytics';
 
-axios.defaults.baseURL = 'http://localhost:8000';
+axios.defaults.baseURL = 'https://mini-search-p4mq.shuttle.app';
 
 function App() {
   return (
