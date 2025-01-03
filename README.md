@@ -81,4 +81,6 @@ _You may need to update the baseURL in `App.tsx` to point to your backend_
 - Add more entrypoints for crawling supported sites
 
 ### Code
--   Better logging
+- Better logging
+- Use `facet` for storing `domain` in index
+- Explore `tantivy::SnippetGenerator`
