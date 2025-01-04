@@ -1,5 +1,13 @@
 # Implementation
-This document contains some implementation details, design decisions and approaches for next steps
+This document contains some implementation details, design decisions and approaches for next steps.
+
+To start with, I decided to build the Crawler and the Index in Rust to ensure its fast, has less runtime errors
+and a better developer experience to work with. I also had a hunch that it'll be easier to find good state of 
+the art libraries which I could use ( and I was right ). Once I had finalized Rust for the indexer and the crawler,
+I decided to use axum for serving the APIs because I wanted to keep everything in Rust as far as possible. This way its
+easier to integrate and work with stuff. Finally decided to use React and Vite for the UI because that is what I was the
+most comfortable with. Backend deployments were done on Shuttle as its has good support for deploying Rust backends, and
+fronted was on firebase because it has a very generous free tier hosting.
 
 ## Components
 
@@ -10,13 +18,14 @@ Looked into various crawlers in various languages for e.g.
 - [colly](https://github.com/gocolly/colly)
 
 But finally decided to use [voyager](https://github.com/mattsse/voyager) because
-- Rust based ( I wanted to keep the whole project in mono linguistic )
+- Rust based ( I wanted to keep the whole project mono linguistic )
 - Easily programmable stateful crawlers ( Although I'm not using this feature, it's a good to have to make it extensible )
 - Support for customizing the crawl function
 - Small and easy to understand codebase, making it easy to modify it according to use ( I also gave building my own crawler a thought - and this seemed like a good compromise )
 
 ### Index
 Decided to use [tantivy](https://github.com/quickwit-oss/tantivy) because
+- First class Rust support
 - Found benchmarks where tantivy was faster for text data
 - low memory footprint
 - easy integration with rust and lots of resources available
