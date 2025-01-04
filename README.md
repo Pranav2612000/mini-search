@@ -73,6 +73,9 @@ _You may need to update the baseURL in `App.tsx` to point to your backend_
 - You'll be asked to set up a new project by shuttle
 *Shuttle has limits on the file sizes, so you'll not be able to upload a large index*
 
+## Design Decisions and Implementation details
+Read more about this here - [IMPLEMENTATION](https://github.com/Pranav2612000/mini-search/blob/main/IMPLEMENTATION.md)
+
 ## Next Steps
 
 ### System Improvements
