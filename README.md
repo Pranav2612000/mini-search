@@ -13,7 +13,7 @@ A mini search engine specifically designed for searching programming documentati
 - [shuttle](https://shuttle.dev) for API deployment
 - [firebase](https://firebase.google.com/) for UI deployment
 
-## Getting Started
+## Getting started
 
 ### Dependencies
 
